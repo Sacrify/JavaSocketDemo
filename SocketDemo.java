@@ -35,6 +35,7 @@ public class SocketDemo {
 		return -1;
 	}
 	
+	// WARNING!!! Here we may need to use <<< instead of <<
 	public static int toIntFromByteBigEnding(byte x1, byte x2, byte x3, byte x4){
 		return (x4 << 24) & 0xFF000000 | 
 				(x3 << 16) & 0x00FF0000 |
@@ -42,6 +43,7 @@ public class SocketDemo {
 				(x1 << 0) & 0x000000FF;
 	}
 	
+	// WARNING!!! Here we may need to use <<< instead of <<
 	public static int toIntFromByte(byte x1, byte x2, byte x3, byte x4){
 		return (x1 << 24) & 0xFF000000 | 
 				(x2 << 16) & 0x00FF0000 |
@@ -49,6 +51,7 @@ public class SocketDemo {
 				(x4 << 0) & 0x000000FF;
 	}
 	
+	// WARNING!!! Here we may need to use <<< instead of <<
 	public static int reorder(int x){
 		byte x1 = (byte) ((x >> 0) & 0x000000FF);
 		byte x2 = (byte) ((x >> 8) & 0x000000FF);
@@ -69,6 +72,7 @@ public class SocketDemo {
 			//if (headIndex == -1) return;
 			if (myRecvIndicator < 6) return;
 			
+			// WARNING!!! Here we may need to use <<< instead of <<
 			int msgTotalCount = 0;
 			int msgContentCnt = 
 					(myRecv[headIndex + 4] << 8) & 0xFF00 |

@@ -1,22 +1,28 @@
 import java.io.IOException;
+import java.util.Date;
 
 
 public class RecvThread extends Thread {
-
+	
+	public SocketDemo socketDemo;
+	
 	public void run(){
-		while (SocketDemo.myQuitSignal == false){
+		while (this.socketDemo.myQuitSignal == false){
 			try {
-				int readCount = SocketDemo.myReader.read(
-						SocketDemo.myRecv, SocketDemo.myRecvIndicator, 
-						SocketDemo.myRecvCount - SocketDemo.myRecvIndicator - 1);
+				int readCount = this.socketDemo.myReader.read(
+						this.socketDemo.myRecv, this.socketDemo.myRecvIndicator, 
+						this.socketDemo.myRecvCount - this.socketDemo.myRecvIndicator - 1);
 				if (readCount > 0) {
-					SocketDemo.myRecvIndicator += readCount;
-					SocketDemo.processData();
+					this.socketDemo.myRecvIndicator += readCount;
+					this.socketDemo.processData();
 				}
 					
 			} catch (IOException e) {
 				e.printStackTrace();
+				this.socketDemo.myQuitSignal = true;
+				this.socketDemo.myQuitDate = new Date();
 			}
 		}
 	}
+
 }

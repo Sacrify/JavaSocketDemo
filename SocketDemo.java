@@ -1,23 +1,69 @@
 import java.net.*;
 import java.io.*;
+import java.util.Date;
 import java.util.concurrent.LinkedBlockingQueue;
 
-import sun.misc.*;
+//import sun.misc.*;
 
 public class SocketDemo {
 
-	static LinkedBlockingQueue<message> msgQueue = new LinkedBlockingQueue<message>();
-	static Socket mySocket = null;
-	static OutputStream myWriter = null;
-	static InputStream myReader = null;
-	static boolean myQuitSignal = false;
-	static int myRecvCount = 5120;
-	static byte [] myRecv = new byte [myRecvCount];
-	static int myRecvIndicator = 0;
-
-	static BASE64Decoder decoder = new BASE64Decoder();
+	public LinkedBlockingQueue<message> msgQueue = new LinkedBlockingQueue<message>();
+	public Socket mySocket = null;
+	public OutputStream myWriter = null;
+	public InputStream myReader = null;
+	public boolean myQuitSignal = false;
+	public Date myQuitDate;
+	final int myRecvCount = 5120;
+	public byte [] myRecv = new byte [myRecvCount];
+	public int myRecvIndicator = 0;
+	public SendThread mySendTh;
+	public RecvThread myRecvTh;
 	
-	public static void clearBuffer() {
+	public static SocketDemo createSocketDemo(String host, int port) {
+		SocketDemo demo = new SocketDemo();
+
+		try {
+			demo.mySocket = new Socket(host, port);
+		} catch (UnknownHostException e) {
+			e.printStackTrace();
+			return null;
+		} catch (IOException e) {
+			e.printStackTrace();
+			return null;
+		}
+		
+	    try {
+	        demo.mySocket.setTcpNoDelay(true);
+	    } catch (SocketException e1) {
+	    	e1.printStackTrace();
+	    	return null;
+	    }
+        
+	    try {
+	    	demo.myWriter = demo.mySocket.getOutputStream();
+	    	demo.myReader = demo.mySocket.getInputStream();
+	    } catch (IOException e) {
+	    	e.printStackTrace();
+	    	return null;
+	    }
+        
+	    demo.clearBuffer();
+            
+	    demo.mySendTh = new SendThread();
+	    demo.myRecvTh = new RecvThread();
+	        
+	    demo.mySendTh.socketDemo = demo;
+	    demo.myRecvTh.socketDemo = demo;
+        
+	    demo.mySendTh.start();
+	    demo.myRecvTh.start();
+		
+		return demo;
+	}
+	
+	//static BASE64Decoder decoder = new BASE64Decoder();
+	
+	public void clearBuffer() {
 		for (int i = 0; i < myRecvCount; i++){
 			myRecv[i] = 0;
 		}
@@ -25,7 +71,7 @@ public class SocketDemo {
 	}
 	
 	
-	public static int searchForHead(int from){
+	public int searchForHead(int from){
 		for (int i = from; i < myRecvIndicator - 4; i++){
 			if (myRecv[i] == '$' && myRecv[i+1] == '@' && 
 					myRecv[i + 2] == '$' && myRecv[i + 3] == '@')
@@ -61,7 +107,7 @@ public class SocketDemo {
 		return toIntFromByte(x1, x2, x3, x4);
 	}
 	
-	public static void processData() {
+	public void processData() {
 		System.out.println("processData");
 		int headIndex = -1;
 		
@@ -82,7 +128,7 @@ public class SocketDemo {
 			
 			if (msgTotalCount > myRecvIndicator) return;
 			
-			int contentIndex = headIndex + 6;
+			// int contentIndex = headIndex + 6;
 			
 			for (int i = 0; i < msgTotalCount; i++){
 				System.out.println(String.format("%02x", (myRecv[headIndex + i] & 0xFF)));
@@ -104,39 +150,5 @@ public class SocketDemo {
 			
 			System.out.println("processData Done. myRecvIndicator: " + myRecvIndicator);
 		}
-	}
-	
-	
-	public static void main(String[] args) {
-		
-		try {
-			mySocket = new Socket("xxx.xxx.xxx.xxx", 8080);
-		} catch (UnknownHostException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		
-		try {
-			mySocket.setTcpNoDelay(true);
-		} catch (SocketException e1) {
-			e1.printStackTrace();
-		}
-		
-		try {
-			myWriter = mySocket.getOutputStream();
-			myReader = mySocket.getInputStream();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		
-		clearBuffer();
-			
-		SendThread sendTh = new SendThread();
-		RecvThread recvTh = new RecvThread();
-		
-		sendTh.start();
-		recvTh.start();
-		
 	}
 }

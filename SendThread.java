@@ -1,11 +1,14 @@
 import java.io.IOException;
+import java.util.Date;
 
 
 public class SendThread extends Thread {
 
+	public SocketDemo socketDemo;
+	
 	public void run(){
-		while (SocketDemo.myQuitSignal == false) {
-			if (SocketDemo.msgQueue.isEmpty()) {
+		while (this.socketDemo.myQuitSignal == false) {
+			if (this.socketDemo.msgQueue.isEmpty()) {
 				try {
 					java.lang.Thread.sleep(100);
 				} catch (InterruptedException e) {
@@ -14,15 +17,16 @@ public class SendThread extends Thread {
 				}
 			}
 			else {
-				message oneMsg = SocketDemo.msgQueue.peek();
+				message oneMsg = this.socketDemo.msgQueue.peek();
 				try {
 					System.out.println("send message");
-					SocketDemo.myWriter.write(oneMsg.GetDetail());
-					SocketDemo.myWriter.flush();
-					SocketDemo.msgQueue.poll();
-					
+					this.socketDemo.myWriter.write(oneMsg.GetDetail());
+					this.socketDemo.myWriter.flush();
+					this.socketDemo.msgQueue.poll();
 				} catch (IOException e) {
 					e.printStackTrace();
+					this.socketDemo.myQuitSignal = true;
+					this.socketDemo.myQuitDate = new Date();
 				}
 			}
 		}

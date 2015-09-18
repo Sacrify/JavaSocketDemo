@@ -17,7 +17,7 @@ public class RecvThread extends Thread {
 					this.socketDemo.processData();
 				}
 					
-			} catch (IOException e) {
+			} catch (Exception e) {
 				e.printStackTrace();
 				this.socketDemo.myQuitSignal = true;
 				this.socketDemo.myQuitDate = new Date();

@@ -13,6 +13,8 @@ public class SendThread extends Thread {
 					java.lang.Thread.sleep(100);
 				} catch (InterruptedException e) {
 					e.printStackTrace();
+					this.socketDemo.myQuitSignal = true;
+					this.socketDemo.myQuitDate = new Date();
 					break;
 				}
 			}
@@ -23,7 +25,7 @@ public class SendThread extends Thread {
 					this.socketDemo.myWriter.write(oneMsg.GetDetail());
 					this.socketDemo.myWriter.flush();
 					this.socketDemo.msgQueue.poll();
-				} catch (IOException e) {
+				} catch (Exception e) {
 					e.printStackTrace();
 					this.socketDemo.myQuitSignal = true;
 					this.socketDemo.myQuitDate = new Date();

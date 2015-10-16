@@ -34,6 +34,7 @@ public class SocketDemo {
 		
 	    try {
 	        demo.mySocket.setTcpNoDelay(true);
+            demo.mySocket.setSoTimeout(30 * 1000);
 	    } catch (SocketException e1) {
 	    	e1.printStackTrace();
 	    	return null;

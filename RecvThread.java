@@ -1,4 +1,5 @@
 import java.io.IOException;
+import java.net.SocketTimeoutException;
 import java.util.Date;
 
 
@@ -16,7 +17,8 @@ public class RecvThread extends Thread {
 					this.socketDemo.myRecvIndicator += readCount;
 					this.socketDemo.processData();
 				}
-					
+            } catch (SocketTimeoutException e) {
+                continue;
 			} catch (Exception e) {
 				e.printStackTrace();
 				this.socketDemo.myQuitSignal = true;

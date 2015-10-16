@@ -26,8 +26,8 @@ public static void main(String[] args) {
 					continue;
 				}
 				
-				// 30 秒默认超时停止时间
-				if (((new Date()).getTime() - demo.myQuitDate.getTime()) / 1000 > 30) {
+				// 60 秒默认超时停止时间
+				if (((new Date()).getTime() - demo.myQuitDate.getTime()) / 1000 > 60) {
 					if (demo.mySendTh.isAlive()) demo.mySendTh.interrupt();
 					if (demo.myRecvTh.isAlive()) demo.myRecvTh.interrupt();
 					socketDemos.remove(i);

@@ -6,6 +6,7 @@ import java.util.Date;
 public class RecvThread extends Thread {
 	
 	public SocketDemo socketDemo;
+	private static int timeoutCount = 0;
 	
 	public void run(){
 		while (this.socketDemo.myQuitSignal == false){
@@ -17,12 +18,20 @@ public class RecvThread extends Thread {
 					this.socketDemo.myRecvIndicator += readCount;
 					this.socketDemo.processData();
 				}
+				timeoutCount = 0;
             } catch (SocketTimeoutException e) {
+            	if (timeoutCount > 5) {
+					this.socketDemo.myQuitSignal = true;
+					this.socketDemo.myQuitDate = new Date();
+					timeoutCount = 0;
+					return;
+            	}
                 continue;
 			} catch (Exception e) {
 				e.printStackTrace();
 				this.socketDemo.myQuitSignal = true;
 				this.socketDemo.myQuitDate = new Date();
+				return;
 			}
 		}
 	}
